@@ -1,0 +1,73 @@
+close all
+clear
+clc
+
+% load data
+load("R_qa008");
+
+% rename
+linePntNum = length;
+tracePnts = tracts;
+
+% calc size
+[~,linesNum] = size(linePntNum);
+
+% The coordinate points of each curve
+line = cell(1,linesNum);
+
+% plot first line
+line{1} = tracePnts(:,1:linePntNum(1));
+[~,tmpLine] = size(line{1});
+x = line{1}(1,1:tmpLine);
+y = line{1}(2,1:tmpLine);
+z = line{1}(3,1:tmpLine);
+plot3(x,y,z);
+hold on
+
+% init 
+tmpNum=zeros(1,linesNum);
+tmpNum(1) = linePntNum(1);
+
+% plot the rest of the line
+for i=2:linesNum
+tmpNum(i) = tmpNum(i-1) + linePntNum(i);
+line{i} = tracePnts(:,tmpNum(i-1)+1:tmpNum(i));
+[~,tmpLine] = size(line{i});
+x = line{i}(1,1:tmpLine);
+y = line{i}(2,1:tmpLine);
+z = line{i}(3,1:tmpLine);
+plot3(x,y,z);
+hold on
+end
+
+% init distance's cell,Store the distance from the i curve to all curves
+distance = cell(1,linesNum);
+dist_idx = 1;
+
+
+% Calculate the nearest distance between curves
+for i = 1:linesNum
+i = 1;
+[~,tmpline_i] = size(line{i});
+for ii = 1:tmpline_i
+    %         for j = 1:linesNum
+    j = 1;
+    if(j != i)
+        [~,tmpline_j] = size(line{j});
+        %             dist = zeros(1,tmpline_j);
+        for jj = 1:tmpline_j
+            dist(ii,jj) = calcSpatialPointDistance(line{i}(1,ii),line{i}(2,ii),line{i}(3,ii),...
+                line{j}(1,jj),line{j}(2,jj),line{j}(3,jj));
+        end
+    end
+    
+    %         end
+end
+ditance{dist_idx} = dist;
+end
+
+
+function [dist] = calcSpatialPointDistance(x1,y1,z1,x2,y2,z2)
+    dist = sqrt(((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2));
+end
+
