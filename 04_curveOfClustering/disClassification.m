@@ -2,18 +2,21 @@ close all
 clear
 clc
 
+dbstop if error
 % load Distance.mat
-load("distance.mat");
+load('distance_2.mat');
 
 MAX_DISTANCE = 1;
 % init
 Num = length(distance);
 Dist = zeros(Num,Num);
-line = zeros(1,Num);
+line = struct('distance',zeros(1,Num),'flag',zeros(1,1),'kind',zeros(1,1));
 for i = 1 : Num
+    line(i).distance = zeros(1,Num);
     line(i).flag = 0;
     line(i).kind = i;
 end
+
 % cell to matrix
 % distance = cell2mat(distance);
 
@@ -23,8 +26,8 @@ end
 
 % Sort the distance array
 distNum = size(Dist,1);
-for i = 1 : distNum
-    [min_dist, min_dist_idx] =  findSecondMin(Dist(i,:));
+for i = 1 : distNum-1
+    [min_dist, min_dist_idx] =  findSecondMin(Dist(i,:),i);
     if(Dist(i,min_dist_idx) < MAX_DISTANCE)
         if line(i).flag == 0
             line(i).kind = min_dist_idx;
@@ -43,7 +46,7 @@ end
 
 
 
-function [secondMin, idx] =findSecondMin(distance)
+function [secondMin, idx] =findSecondMin(distance,min_idx)
     dist = distance;
     distNum = length(dist);
     for i = 1 : distNum-1
@@ -55,7 +58,8 @@ function [secondMin, idx] =findSecondMin(distance)
             end
         end
     end
-    
-    secondMin = dist(2);
-    idx = find(dist == secondMin);
+    if (min_idx < distNum)
+        secondMin = dist(min_idx+1);
+    end
+    idx = find(distance == secondMin);
 end
