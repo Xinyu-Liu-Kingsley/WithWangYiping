@@ -28,6 +28,7 @@ Dist = Dist + Dist';
 distNum = size(Dist,1);
 for i = 1 : distNum-1
     [min_dist, min_dist_idx] =  findSecondMin(Dist(i,:));
+%     [idx] = findMin(Dist(i,:),MAX_DISTANCE);
     if(Dist(i,min_dist_idx) < MAX_DISTANCE)
         if line(i).flag == 0
             line(i).kind = min_dist_idx;
@@ -41,7 +42,7 @@ for i = 1 : distNum
     kind_array(i) = line(i).kind;
 end
 [cluster, ia , kind_idx] = unique(kind_array);
-
+%%
 kind_Nums = cell(1,length(cluster));
 for i = 1 : length(cluster)
     clu = cluster(i);
@@ -55,7 +56,8 @@ for i = 1:length(cluster)
     plot_line = kind_Nums{i};
     for j = 1 : size(plot_line)
         m = plot_line(j);
-        [~,tmpLine] = size(line{m});
+        Temp = line{m};
+        [~,tmpLine] = size(Temp);
 %         x = line{m}(1,1:tmpLine);
 %         y = line{m}(2,1:tmpLine);
 %         z = line{m}(3,1:tmpLine);
@@ -122,6 +124,28 @@ function [secondMin, idx] =findSecondMin(distance)
             end
         end
     end
-        secondMin = dist(2);
+    secondMin = dist(2);
     idx = find(distance == secondMin);
+end
+
+function [idx] =findMin(distance,MAX_DISTANCE)
+    dist = distance;
+    distNum = length(dist);
+    for i = 1 : distNum-1
+        for j = i+1 : distNum
+            if(dist(i) > dist(j))
+                tmp = dist(j);
+                dist(j) = dist(i);
+                dist(i) = tmp;
+            end
+        end
+    end
+    count = 0;
+    for i = 1 : distNum-1
+        if(dist(i) < MAX_DISTANCE) && (dist(i) ~= 0)
+           tmpIdx = find(distance == dist(i));
+           count = count + 1;
+           idx(count) = tmpIdx;
+        end
+    end
 end
